@@ -1,0 +1,12 @@
+{
+  "iss": "https://accounts.google.com",
+  "sub": "104910517849920940857",
+  "name": "Tech Magnet",
+  "email": "techmagnet5091@gmail.com",
+  "picture": "https://lh3.googleusercontent.com/a/ACg8ocIYn5VUrM-4jBaPL0NHk2sK0oSDhu9C7svmCJcE2F20=s96-c",
+  "full_name": "Tech Magnet",
+  "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocIYn5VUrM-4jBaPL0NHk2sK0oSDhu9C7svmCJcE2F20=s96-c",
+  "provider_id": "104910517849920940857",
+  "email_verified": true,
+  "phone_verified": false
+}
