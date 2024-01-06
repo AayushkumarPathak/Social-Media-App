@@ -27,13 +27,13 @@ export default function Home() {
       .from("profiles")
       .select()
       .eq("id", session.user.id)
-      .then((result) => {
+      .then((result) => { 
         if (result.data.length) {
           setProfile(result.data[0]);
         }
       });
   }, [session?.user?.id]);
-
+// commiting 1st time
   function fetchPosts() {
     supabase
       .from("posts")
