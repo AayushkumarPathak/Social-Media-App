@@ -6,7 +6,7 @@ import Link from "next/link";
 import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "./contexts/UserContent";
 
-export default function PostCard({content,created_at, profiles:author}) {
+export default function PostCard({content,created_at,photos, profiles:author}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
   const {profile:myProfile} = useContext(UserContext);
@@ -56,9 +56,9 @@ export default function PostCard({content,created_at, profiles:author}) {
         </div>
         <div className="grow">
           <p>
-            <Link href="/profile">
+            <Link href={'/profile/'+author?.id}>
               <span className=" mr-2 font-semibold cursor-pointer hover:underline">
-                {author.name}
+                {author?.name}
               </span>
             </Link>
             shared a<a className="text-socialBlue"> post</a>
@@ -191,15 +191,24 @@ export default function PostCard({content,created_at, profiles:author}) {
       </div>
       {/* ... rest of your post card */}
       <div>
-        <p className="my-4 text-sm">
-          {content} 
-        </p>
-        <div>
+        <p className="my-4 text-sm">{content} </p>
+        {photos?.length > 0 && (
+          <div className="flex gap-2">
+        {photos.map(photo =>(
+          <div className="">
+            <img src={photo} className="rounded-md w-full h-52" alt="yourPosts.." />
+          </div>
+        )) }
+        </div>
+        )}
+        
+        
+        {/* <div>
           <img
             src="https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGdyZWVjZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60 "
             alt=""
           />
-        </div>
+        </div> */}
       </div>
       <div className="mt-5 flex gap-8">
         <button className="flex gap-2 iteams-center">

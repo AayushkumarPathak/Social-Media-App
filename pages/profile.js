@@ -9,11 +9,75 @@ import PostCard from "@/app/PostCard";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import FriendInfo from "@/app/FriendInfo";
+import { useEffect, useState } from "react";
+import Id from "./profile/[id]";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { createClient } from "@supabase/supabase-js";
+import Cover from "@/app/Cover";
 
 export default function ProfilePage() {
+  const [profile, setProfile] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [name, setname] = useState("");
+  const [place, setplace] = useState("");
   const router = useRouter();
-  // const pathname = usePathname();
+  // const session = useSession();
+  // console.log("session",session);
+  // console.log(router);
+  // console.log("Profile", profile);
+
   const pathname = usePathname?.() || "";
+  // const supabase = useSupabaseClient();
+  const user = pathname.split("/");
+  // console.log(user);
+  // console.log("ans= ",user[2]);
+  const userId = user[2];
+  const userSession = user[2];
+  // console.log("userId",userId);
+  // console.log(pathname);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  // console.log("Finally userSession=",userSession);
+  const isMyUser = userId === userSession;
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    fetchUser();
+  }, [userId]);
+  function fetchUser() {
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", userId)
+      .then((result) => {
+        if (result.error) {
+          throw result.error;
+        }
+        if (result.data) {
+          setProfile(result.data[0]);
+        }
+      });
+  }
+  function saveProfile() {
+    supabase
+      .from("profiles")
+      .update({
+        name,
+        place,
+      })
+      .eq("id", userId)
+      .then((result) => {
+        if (!result.error) {
+          setProfile((prev) => ({ ...prev, name, place }));
+        }
+        setEditMode(false);
+      });
+  }
+
   const isPosts = pathname.includes("posts") || pathname === "/profile";
   const isAbout = pathname.includes("about");
   const isFriends = pathname.includes("friends");
@@ -29,20 +93,103 @@ export default function ProfilePage() {
     <LayoutH>
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md -my-3 -mr-4 -ml-4 -mt-4">
-          <div className="h-36 overflow-hidden flex justify-center items-center">
-            <img
-              src="https://images.unsplash.com/photo-1498503182468-3b51cbb6cb24?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
-              alt=""
-            />
-          </div>
-          <div className="absolute top-24 left-4">
-            <Avatar size={"lg"} />
+          <Cover
+            url={profile?.cover}
+            editable={isMyUser}
+            onChange={fetchUser}
+          />
+          <div className="absolute top-24 left-4 z-20">
+            {profile && (
+              <Avatar
+                url={profile.avatar}
+                size={"lg"}
+                editable={isMyUser}
+                onChange={fetchUser}
+              />
+            )}
           </div>
           <div className="p-4 pt-0 md:pt-4 pb-0 ">
-            <div className="ml-30  mx-28 md:ml-40 ">
-              <h1 className=" text-3xl font-bold">Pawan</h1>
-              <div className="text-gray-500 leading-4">New Delhi, India</div>
+            <div className="ml-30  mx-28 md:ml-40 flex justify-between">
+              <div>
+                {editMode && (
+                  <div>
+                    <input
+                      className="border py-2 px-3 rounded-md"
+                      type="text"
+                      placeholder={"Your name"}
+                      onChange={(ev) => setname(ev.target.value)}
+                      value={name}
+                    />
+                  </div>
+                )}
+                {!editMode && (
+                  <h1 className=" text-3xl my-1 font-bold">{profile?.name}</h1>
+                )}
+                {!editMode && (
+                  <div className="text-gray-500 leading-4">
+                    {profile?.place || "India"}
+                  </div>
+                )}
+                {editMode && (
+                  <div>
+                    <input
+                      className="border py-2 px-3 rounded-md mt-1"
+                      type="text"
+                      placeholder={"Your location"}
+                      onChange={(ev) => setplace(ev.target.value)}
+                      value={place}
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="">
+                <div className="text-right">
+                  {isMyUser && !editMode && (
+                    <button
+                      onClick={() => {
+                        setEditMode(true);
+                        setname(profile.name);
+                        setplace(profile.place);
+                      }}
+                      className="bg-white flex gap-1 rounded-md shadow-md shadow-gray-400 py-1 px-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                        />
+                      </svg>
+                      Edit profile
+                    </button>
+                  )}
+                  {isMyUser && editMode && (
+                    <button
+                      onClick={saveProfile}
+                      className="bg-white gap-1 rounded-md shadow-md shadow-gray-400 py-1 px-2 mx-1 inline-flex "
+                    >
+                      Save
+                    </button>
+                  )}
+                  {isMyUser && editMode && (
+                    <button
+                      onClick={() => setEditMode(false)}
+                      className="bg-white inline-flex gap-1 rounded-md shadow-md mx-1 shadow-gray-400 py-1 px-2"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
+
             <div className="mt-5 md:mt-10 flex gap-3  ">
               <Link
                 href={"/profile/posts"}

@@ -7,18 +7,65 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import LoginPage from "../../pages/login";
 import { useEffect, useState } from "react";
 import { UserContext } from "./contexts/UserContent";
+import { createClient } from "@supabase/supabase-js";
 
 export default function Home() {
-  const supabase = useSupabaseClient();
+  // const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
   // console.log(session);
 
+  // const getSession = async () =>{
+  //   const {
+  //     data:{
+  //       session
+  //     }
+  //   } = await supabase.auth.getSession();
+  //   return session;
+    
+  // }
+  // const sessionObject = await getSession();
+  // console.log("session obj",sessionObject);
+//------------------------------------------ this worked.
+//   const getSession = () => {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             const {
+//                 data: {
+//                     session
+//                 }
+//             } = await supabase.auth.getSession();
+
+//             resolve(session.user.id);
+//         } catch (error) {
+//             reject(error);
+//         }
+//     });
+// }
+
+// // Call the function and handle the result using then/catch
+// getSession()
+//     .then(sessionObject => {
+//         // Now you can use the sessionObject as needed
+//         console.log("session object: ",sessionObject);
+//         // console.log("Session object id: ",sessionObject.user.id);
+//     })
+//     .catch(error => {
+//         console.error("Error getting session:", error);
+//     });
+
+  
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+
+
   useEffect(() => {
     fetchPosts();
   }, []);
-
+  
   useEffect(() => {
     if (!session?.user?.id) {
       return;
@@ -37,7 +84,7 @@ export default function Home() {
   function fetchPosts() {
     supabase
       .from("posts")
-      .select("id, content, created_at, profiles(id,avatar,name)")
+      .select("id, content, created_at, photos, profiles(id,avatar,name)")
       .order("created_at", { ascending: false })
       .then((result) => {
         console.log("posts", result);

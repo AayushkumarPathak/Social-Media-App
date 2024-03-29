@@ -5,6 +5,7 @@ import Card from "./Card";
 /** @type {import('tailwindcss').Config} */
 import Link from "next/link";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { createClient } from "@supabase/supabase-js";
 
 export default function NavigationCard() {
   const router = useRouter();
@@ -15,8 +16,12 @@ export default function NavigationCard() {
     " text-sm md:text-md flex md:gap-1 md:gap-3 py-3 my-1 bg-socialBlue text-white md:-mx-8 px-6 md:px-8 rounded-md shadow-md shadow-gray-300 items-center";
   const nonActiveElementClasses =
     "text-sm md:text-md flex md:gap-1 md:gap-3 py-2 my-2 hover:bg-blue-500 hover:bg-opacity-20 md:-mx-4 px-6 md:px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300 items-center";
-    const supabase = useSupabaseClient();
+    // const supabase = useSupabaseClient();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseKey);
     async function logout(){
+      // await supabase.auth.signOut();
       await supabase.auth.signOut();
     }
     
@@ -151,7 +156,7 @@ export default function NavigationCard() {
           <span className="hidden md:block">Notifications</span>
         </Link>
         <span className="hidden md:block">
-          <Link
+          {/* <Link
           href="/feeds"
           className={
             pathname === "/feeds"
@@ -175,9 +180,9 @@ export default function NavigationCard() {
           </svg>
 
           <span className="hidden md:block">Feeds</span>
-        </Link>
+        </Link> */}
 
-        <Link
+        {/* <Link
           href="/events"
           className={
             pathname === "/events"
@@ -199,7 +204,7 @@ export default function NavigationCard() {
           </svg>
 
           <span className="hidden md:block">Events</span>
-        </Link>
+        </Link> */}
         <Link
           href="/chithichat"
           className={
@@ -223,7 +228,7 @@ export default function NavigationCard() {
 
           <span className="hidden md:block  hover:text-emerald-600  hover:skew-y-6 hover:uppercase">ChithiChat</span>
         </Link>
-        <Link
+        {/* <Link
           href="/settings"
           className={
             pathname === "/settings"
@@ -252,13 +257,13 @@ export default function NavigationCard() {
           </svg>
 
           <span className="hidden md:block">Settings</span>
-        </Link>
+        </Link> */}
 
         </span>
         
         <button onClick={logout} className="w-full -my-2" >
           <span>
-          <button className="w-full -my-2">
+          {/* <button className="w-full -my-2"> */} {/* !!causing hydration error button in sapn!! */}
         <span className={nonActiveElementClasses}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -276,7 +281,7 @@ export default function NavigationCard() {
           </svg>
          <span className="hidden md:block text-orange-500 font-semibold hover:italic text-opacity-80">Logout</span>
         </span>
-        </button>
+        {/* </button> */}
           </span>
         
         </button>
